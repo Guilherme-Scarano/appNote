@@ -27,16 +27,23 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Inicialização dos componentes da interface
         addNoteBtn = findViewById(R.id.add_note_btn);
         recyclerView = findViewById(R.id.recyler_view);
         menuBtn = findViewById(R.id.menu_btn);
 
+        // Definição do listener de clique para o botão de adicionar nota
         addNoteBtn.setOnClickListener((v)-> startActivity(new Intent(MainActivity.this,NoteDetailsActivity.class)) );
+
+        // Definição do listener de clique para o botão de menu
         menuBtn.setOnClickListener((v)->showMenu() );
+
+        // Configuração do RecyclerView
         setupRecyclerView();
     }
 
     void showMenu(){
+        // Exibição do menu de opções em um popup menu
         PopupMenu popupMenu  = new PopupMenu(MainActivity.this,menuBtn);
         popupMenu.getMenu().add("Logout");
         popupMenu.show();
@@ -44,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 if(menuItem.getTitle()=="Logout"){
+                    // Realizar logout do usuário
                     FirebaseAuth.getInstance().signOut();
                     startActivity(new Intent(MainActivity.this,LoginActivity.class));
                     finish();
@@ -52,13 +60,19 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+    }
 
-
-        }
     void setupRecyclerView(){
+        // Configurar o RecyclerView para exibir as notas em ordem decrescente de timestamp
+
+        // Obter a referência à coleção de notas ordenada por timestamp
         Query query  = Utility.getCollectionReferenceForNotes().orderBy("timestamp",Query.Direction.DESCENDING);
+
+        // Configurar as opções do adaptador FirestoreRecyclerOptions
         FirestoreRecyclerOptions<Note> options = new FirestoreRecyclerOptions.Builder<Note>()
                 .setQuery(query,Note.class).build();
+
+        // Configurar o layout manager e o adaptador para o RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         noteAdapter = new NoteAdapter(options,this);
         recyclerView.setAdapter(noteAdapter);
@@ -67,19 +81,23 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        // Iniciar a escuta do adaptador FirestoreRecyclerAdapter
         noteAdapter.startListening();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        // Parar a escuta do adaptador FirestoreRecyclerAdapter
         noteAdapter.stopListening();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        // Notificar o adaptador de que os dados podem ter sido alterados
         noteAdapter.notifyDataSetChanged();
     }
 }
+
 

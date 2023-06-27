@@ -19,7 +19,8 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class CreateAccountActivity extends AppCompatActivity {
 
-    EditText emailEditText,passwordEditText,confirmPasswordEditText;
+    // Declaração das variáveis para os componentes da interface
+    EditText emailEditText, passwordEditText, confirmPasswordEditText;
     Button createAccountBtn;
     ProgressBar progressBar;
     TextView loginBtnTextView;
@@ -29,6 +30,7 @@ public class CreateAccountActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_account);
 
+        // Inicialização dos componentes da interface
         emailEditText = findViewById(R.id.email_edit_text);
         passwordEditText = findViewById(R.id.senha_edit_text);
         confirmPasswordEditText = findViewById(R.id.confirma_senha_edit_text);
@@ -36,70 +38,74 @@ public class CreateAccountActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progress_bar);
         loginBtnTextView = findViewById(R.id.login_text_view_btn);
 
-        createAccountBtn.setOnClickListener(v-> createAccount());
-        loginBtnTextView.setOnClickListener(v-> finish());
-
+        // Configuração dos listeners de clique para os botões
+        createAccountBtn.setOnClickListener(v -> createAccount());
+        loginBtnTextView.setOnClickListener(v -> finish());
     }
 
-    void createAccount(){
+    // Método chamado quando o botão de criar conta é clicado
+    void createAccount() {
+        // Obtém os dados dos campos de texto
         String email = emailEditText.getText().toString();
         String password = passwordEditText.getText().toString();
         String confirmPassword = confirmPasswordEditText.getText().toString();
 
-        boolean isValidated = validateData(email,password,confirmPassword);
-        if(!isValidated){
+        // Valida os dados inseridos
+        boolean isValidated = validateData(email, password, confirmPassword);
+        if (!isValidated) {
             return;
         }
 
-        createAccountInFirebase(email,password);
-
+        // Cria a conta no Firebase
+        createAccountInFirebase(email, password);
     }
 
-    void createAccountInFirebase(String email, String password){
-        changeInProgress(true);
+    // Método responsável por criar a conta no Firebase
+    void createAccountInFirebase(String email, String password) {
+        changeInProgress(true); // Altera a visibilidade dos componentes para indicar o progresso
 
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-        firebaseAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(CreateAccountActivity.this, new OnCompleteListener<AuthResult>() {
+        // Cria a conta no Firebase utilizando o email e senha fornecidos
+        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(CreateAccountActivity.this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-                changeInProgress(false);
-                if(task.isSuccessful()){
-                    //criou com sucesso
-                    Toast.makeText(CreateAccountActivity.this,"Conta criada com sucesso, verifique seu email",Toast.LENGTH_SHORT).show();
+                changeInProgress(false); // Altera a visibilidade dos componentes para indicar que o progresso terminou
+                if (task.isSuccessful()) {
+                    // Conta criada com sucesso
+                    Toast.makeText(CreateAccountActivity.this, "Conta criada com sucesso, verifique seu email", Toast.LENGTH_SHORT).show();
                     firebaseAuth.getCurrentUser().sendEmailVerification();
                     firebaseAuth.signOut();
                     finish();
-                }else{
-                    //falhou
-                    Toast.makeText(CreateAccountActivity.this,task.getException().getLocalizedMessage(),Toast.LENGTH_SHORT).show();
-
+                } else {
+                    // Falha ao criar a conta
+                    Toast.makeText(CreateAccountActivity.this, task.getException().getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
-
     }
 
-    void changeInProgress(boolean inProgress){
-        if(inProgress){
+    // Método responsável por alterar a visibilidade dos componentes para indicar o progresso
+    void changeInProgress(boolean inProgress) {
+        if (inProgress) {
             progressBar.setVisibility(View.VISIBLE);
             createAccountBtn.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             progressBar.setVisibility(View.GONE);
             createAccountBtn.setVisibility(View.VISIBLE);
         }
     }
 
-    boolean validateData(String email, String password,String confirmPassword){
-
-        if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+    // Método responsável por validar os dados inseridos
+    boolean validateData(String email, String password, String confirmPassword) {
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             emailEditText.setError("Email inválido");
             return false;
         }
-        if(password.length()<6){
+        if (password.length() < 6) {
             passwordEditText.setError("Senha inválida");
             return false;
         }
-        if(!password.equals(confirmPassword)){
+        if (!password.equals(confirmPassword)) {
             confirmPasswordEditText.setError("Senha não é a mesma");
             return false;
         }

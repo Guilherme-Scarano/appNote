@@ -23,13 +23,16 @@ public class NoteAdapter extends FirestoreRecyclerAdapter<Note, NoteAdapter.Note
         this.context = context;
     }
 
+    // Chamado quando é necessário vincular os dados de uma nota à visualização de item no RecyclerView.
     @Override
     protected void onBindViewHolder(@NonNull NoteViewHolder holder, int position, @NonNull Note note) {
         holder.titleTextView.setText(note.title);
         holder.contentTextView.setText(note.content);
         holder.timestampTextView.setText(Utility.timestampToString(note.timestamp));
 
+        // Define um listener de clique para o item da nota no RecyclerView
         holder.itemView.setOnClickListener((v)->{
+            // Cria uma intent para abrir a activity de detalhes da nota
             Intent intent = new Intent(context,NoteDetailsActivity.class);
             intent.putExtra("title",note.title);
             intent.putExtra("content",note.content);
@@ -37,18 +40,20 @@ public class NoteAdapter extends FirestoreRecyclerAdapter<Note, NoteAdapter.Note
             intent.putExtra("docId",docId);
             context.startActivity(intent);
         });
-
     }
 
+    // Cria uma nova instância de ViewHolder para exibir os itens da nota no RecyclerView.
     @NonNull
     @Override
     public NoteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        // Infla o layout do item da nota
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_note_item,parent,false);
         return new NoteViewHolder(view);
     }
 
-    class NoteViewHolder extends RecyclerView.ViewHolder{
-        TextView titleTextView,contentTextView,timestampTextView;
+    // ViewHolder para representar os itens da nota no RecyclerView.
+    class NoteViewHolder extends RecyclerView.ViewHolder {
+        TextView titleTextView, contentTextView, timestampTextView;
 
         public NoteViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -58,3 +63,4 @@ public class NoteAdapter extends FirestoreRecyclerAdapter<Note, NoteAdapter.Note
         }
     }
 }
+

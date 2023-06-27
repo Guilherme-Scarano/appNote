@@ -1,6 +1,7 @@
 package br.edu.ifsuldeminas.mch.note;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -46,7 +47,7 @@ public class NoteDetailsActivity extends AppCompatActivity {
         pageTitleTextView = findViewById(R.id.page_title);
         deleteNoteTextViewBtn = findViewById(R.id.delete_note_text_view_btn);
 
-        //receive data
+        // Receber os dados da nota
         title = getIntent().getStringExtra("title");
         content = getIntent().getStringExtra("content");
         docId = getIntent().getStringExtra("docId");
@@ -68,6 +69,7 @@ public class NoteDetailsActivity extends AppCompatActivity {
 
     }
 
+    // Salva a nota no Firebase
     void saveNote() {
         String noteTitle = titleEditText.getText().toString();
         String noteContent = contentEditText.getText().toString();
@@ -81,16 +83,16 @@ public class NoteDetailsActivity extends AppCompatActivity {
         note.setTimestamp(Timestamp.now());
 
         saveNoteToFirebase(note);
-
     }
 
+    // Salva a nota no Firebase Firestore
     void saveNoteToFirebase(Note note) {
         DocumentReference documentReference;
         if (isEditMode) {
-            //atualiza a nota
+            // Atualiza a nota existente
             documentReference = Utility.getCollectionReferenceForNotes().document(docId);
         } else {
-            //cria nova nota
+            // Cria uma nova nota
             documentReference = Utility.getCollectionReferenceForNotes().document();
         }
 
@@ -98,27 +100,25 @@ public class NoteDetailsActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-                    //note is added
-                    Utility.showToast(NoteDetailsActivity.this, "Nota editada");
+                    // A nota foi adicionada com sucesso
+                    Utility.showToast(NoteDetailsActivity.this, "Nota adicionada");
                     finish();
                 } else {
                     Utility.showToast(NoteDetailsActivity.this, "Falha ao adicionar nota");
                 }
             }
         });
-
     }
 
+    // Exclui a nota do Firebase Firestore
     void deleteNoteFromFirebase() {
-
         DocumentReference documentReference;
-
         documentReference = Utility.getCollectionReferenceForNotes().document(docId);
         documentReference.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-                    //nota é deletada
+                    // A nota foi excluída com sucesso
                     Utility.showToast(NoteDetailsActivity.this, "Nota excluída");
                     finish();
                 } else {
@@ -137,7 +137,3 @@ public class NoteDetailsActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 }
-
-
-
-

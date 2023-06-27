@@ -8,6 +8,7 @@ public class Note {
     Timestamp timestamp;
 
     public Note() {
+        // Construtor vazio necessário para o Firebase Firestore
     }
 
     public String getTitle() {
