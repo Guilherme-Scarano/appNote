@@ -20,6 +20,8 @@ public class SplashActivity extends AppCompatActivity {
 
     private static final int SPLASH_DURATION = 3000; // Duração da tela de splash em milissegundos
 
+    private boolean isActivityValid = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,12 +39,25 @@ public class SplashActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                showInformationFragment();
+                if (isActivityValid) {
+                    showInformationFragment();
+                }
             }
         }, SPLASH_DURATION);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Define que a atividade não é mais válida ao ser destruída
+        isActivityValid = false;
+    }
+
     private void showInformationFragment() {
+        if (!isActivityValid) {
+            return; // Verifica se a atividade ainda é válida antes de exibir o fragmento
+        }
+
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
@@ -51,13 +66,20 @@ public class SplashActivity extends AppCompatActivity {
 
         // Substitui o conteúdo do layout da SplashActivity pelo fragmento
         fragmentTransaction.replace(R.id.splash_container, informationFragment);
+
+        if (!isActivityValid) {
+            return; // Verifica novamente se a atividade ainda é válida antes de fazer o commit
+        }
+
         fragmentTransaction.commit();
 
         // Define um atraso para iniciar a próxima atividade após exibir o fragmento
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                navigateToNextScreen();
+                if (isActivityValid) {
+                    navigateToNextScreen();
+                }
             }
         }, SPLASH_DURATION);
     }
